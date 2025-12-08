@@ -28,8 +28,29 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Create credentials file
-        run: echo "${{ secrets.GOOGLE_CREDENTIALS_JSON }}" > credentials.json
+      - name: Create credentials.json from secret
+        env:
+          GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
+        run: |
+          python - << 'PY'
+          import os, json, pathlib
+
+          raw = os.environ["GOOGLE_CREDENTIALS_JSON"]
+
+          print("Tamanho do secret recebido:", len(raw), "caracteres")
+
+          try:
+            data = json.loads(raw)
+          except json.JSONDecodeError as e:
+            print("ERRO ao fazer json.loads no secret:", e)
+            print("Primeiros 200 caracteres do secret:")
+            print(raw[:200])
+            raise
+
+          path = pathlib.Path("credentials.json")
+          path.write_text(json.dumps(data), encoding="utf-8")
+          print("credentials.json gerado com sucesso, tamanho:", path.stat().st_size, "bytes")
+          PY
 
       - name: Run crawler for ${{ matrix.target.name }}
         run: |
