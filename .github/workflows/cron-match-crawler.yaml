@@ -27,9 +27,9 @@ jobs:
 
       - name: Install dependencies
         run: pip install -r requirements.txt
-      
+
       - name: Create credentials file
-        run: echo '${{ secrets.GOOGLE_CREDENTIALS_JSON }}' | jq -r '.' > credentials.json
+        run: echo "${{ secrets.GOOGLE_CREDENTIALS_JSON }}" > credentials.json
 
       - name: Run crawler for ${{ matrix.target.name }}
         run: |
