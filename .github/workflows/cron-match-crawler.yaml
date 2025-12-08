@@ -1,0 +1,38 @@
+name: Upcoming Matches - Ceará
+
+on:
+  schedule:
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+
+jobs:
+  crawl: 
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        target:
+          - name: ceara
+            url: "https://www.placardefutebol.com.br/time/ceara/proximos-jogos"
+            calendar_id: "2229d57329c1589bf08b9a2752fc29be6fcb7139409a300fb9bd63f866d24a60@group.calendar.google.com"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      
+      - name: Create credentials file
+        run: echo '${{ secrets.GOOGLE_CREDENTIALS_JSON }}' > credentials.json
+
+      - name: Run crawler for ${{ matrix.target.name }}
+        run: |
+          python crawler.py gcalendar \
+            --url "${{ matrix.target.url }}" \
+            --calendar-id "${{ matrix.target.calendar_id }}"
