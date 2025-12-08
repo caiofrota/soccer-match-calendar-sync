@@ -17,5 +17,8 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
       - name: Execute script
         run: python crawler.py https://www.placardefutebol.com.br/time/ceara/proximos-jogos "${{ secrets.GCALENDAR_CEARA }}"
