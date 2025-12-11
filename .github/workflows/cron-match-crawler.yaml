@@ -30,6 +30,9 @@ jobs:
           - name: brasil
             url: "https://www.placardefutebol.com.br/time/brasil/proximos-jogos"
             calendar_id: "5e4c412c5caba27497079e63dd4f54b4eb50f6dafe409a07a58ec63069199558@group.calendar.google.com"
+          - name: copa-do-mundo
+            url: "https://www.placardefutebol.com.br/copa-do-mundo"
+            calendar_id: "055de4983aede32a642bd40331aeffaa1bf2c0f2e65919a432499464f24f28c0@group.calendar.google.com"
 
     steps:
       - name: Checkout code
