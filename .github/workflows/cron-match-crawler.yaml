@@ -55,19 +55,19 @@ jobs:
 
           raw = os.environ["GOOGLE_CREDENTIALS_JSON"]
 
-          print("Tamanho do secret recebido:", len(raw), "caracteres")
+          print("Received secret size:", len(raw), "chars")
 
           try:
             data = json.loads(raw)
           except json.JSONDecodeError as e:
-            print("ERRO ao fazer json.loads no secret:", e)
-            print("Primeiros 200 caracteres do secret:")
+            print("Error decoding JSON from secret:", e)
+            print("First 200 chars of the secret:")
             print(raw[:200])
             raise
 
           path = pathlib.Path("credentials.json")
           path.write_text(json.dumps(data), encoding="utf-8")
-          print("credentials.json gerado com sucesso, tamanho:", path.stat().st_size, "bytes")
+          print("credentials.json generated successfully, size:", path.stat().st_size, "bytes")
           PY
 
       - name: Run crawler for ${{ matrix.target.name }}
