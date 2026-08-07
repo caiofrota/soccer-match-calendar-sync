@@ -2,7 +2,7 @@ name: Upcoming Matches
 
 on:
   schedule:
-    - cron: "0 8 * * *"
+    - cron: "17 8,20 * * *"
   workflow_dispatch:
 
 jobs:
