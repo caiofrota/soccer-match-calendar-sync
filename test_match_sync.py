@@ -17,7 +17,7 @@ sys.modules.setdefault("google.oauth2", oauth2)
 sys.modules.setdefault("googleapiclient", api)
 sys.modules.setdefault("googleapiclient.discovery", discovery)
 
-from crawler import Target, choose_existing, display_summary, event_body, should_create_event
+from match_sync import Target, choose_existing, display_summary, event_body, should_create_event
 from sportscore_client import SportScoreMatch, normalize_status, parse_match
 
 

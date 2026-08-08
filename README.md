@@ -1,7 +1,7 @@
-# Web Soccer Match Crawler
+# Soccer Match Calendar Sync
 
 Sincroniza partidas de futebol da API pública do [SportScore](https://sportscore.com/) com o Google
-Calendar ou gera um arquivo `.ics`. O crawler aceita a agenda de um time ou descobre as partidas de
+Calendar ou gera um arquivo `.ics`. O sincronizador aceita a agenda de um time ou descobre as partidas de
 uma competição por sua classificação, chaveamento e agendas dos participantes.
 
 ## Comportamento da sincronização
@@ -26,19 +26,19 @@ uma competição por sua classificação, chaveamento e agendas dos participante
 pip install -r requirements.txt
 
 # Agenda de um time
-python crawler.py gcalendar \
+python match_sync.py gcalendar \
   --target-type team \
   --slug ceara \
   --calendar-id "seu-calendario@group.calendar.google.com"
 
 # Partidas de uma competição
-python crawler.py gcalendar \
+python match_sync.py gcalendar \
   --target-type competition \
   --slug fifa-world-cup \
   --calendar-id "seu-calendario@group.calendar.google.com"
 
 # Arquivo ICS
-python crawler.py ics \
+python match_sync.py ics \
   --target-type team \
   --slug brazil-women \
   --output calendar.ics

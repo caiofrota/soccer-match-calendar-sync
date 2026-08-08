@@ -1,4 +1,4 @@
-name: Upcoming Matches
+name: Soccer Match Calendar Sync
 
 on:
   schedule:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  crawl:
+  sync:
     runs-on: ubuntu-latest
     timeout-minutes: 25
 
@@ -80,10 +80,10 @@ jobs:
           print("credentials.json generated successfully")
           PY
 
-      - name: Run crawler for ${{ matrix.target.name }}
+      - name: Sync calendar for ${{ matrix.target.name }}
         if: matrix.target.calendar_id != ''
         run: |
-          python crawler.py gcalendar \
+          python match_sync.py gcalendar \
             --target-type "${{ matrix.target.type }}" \
             --slug "${{ matrix.target.slug }}" \
             --calendar-id "${{ matrix.target.calendar_id }}"

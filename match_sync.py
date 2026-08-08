@@ -13,8 +13,8 @@ from googleapiclient.discovery import build
 
 from sportscore_client import SportScoreMatch, SportScoreProvider, normalize
 
-PRODID = "//Caio Frota//Match Crawler v2.0//EN"
-CALNAME = "Match Crawler"
+PRODID = "//Caio Frota//Match Calendar Sync v2.0//EN"
+CALNAME = "Soccer Match Calendar Sync"
 CALDESC = "Calendário de partidas fornecido por SportScore"
 TIMEZONE = "America/Fortaleza"
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
@@ -105,7 +105,7 @@ def event_body(match: SportScoreMatch, target: Target) -> dict:
 
 def stable_ical_uid(match: SportScoreMatch, target: Target) -> str:
     value = f"{target.key}|{match.occurrence_key}".encode()
-    return f"{hashlib.sha256(value).hexdigest()}@match-crawler"
+    return f"{hashlib.sha256(value).hexdigest()}@match-calendar-sync"
 
 
 def should_create_event(match: SportScoreMatch, now: Optional[datetime] = None) -> bool:
@@ -238,7 +238,7 @@ def generate_ics(target: Target, output_file: str) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="SportScore soccer calendar crawler")
+    parser = argparse.ArgumentParser(description="SportScore soccer calendar sync")
     subparsers = parser.add_subparsers(dest="command", required=True)
     for command in ("ics", "gcalendar"):
         child = subparsers.add_parser(command)

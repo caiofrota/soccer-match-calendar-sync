@@ -86,7 +86,7 @@ class SportScoreProvider:
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         self.session = requests.Session()
-        self.session.headers.update({"Accept": "application/json", "User-Agent": "MatchCrawler/2.0"})
+        self.session.headers.update({"Accept": "application/json", "User-Agent": "MatchCalendarSync/2.0"})
 
     def _get(self, endpoint: str, slug: str, **extra: str) -> dict[str, Any]:
         response = self.session.get(
