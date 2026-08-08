@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import Mock
 
-from sportscore_client import SportScoreProvider
+from sportscore_client import RETRYABLE_STATUS_CODES, SportScoreProvider
 
 
 class Response:
@@ -27,6 +27,20 @@ def fixture():
 
 
 class ProviderContractTests(unittest.TestCase):
+    def test_retries_transient_get_failures(self):
+        provider = SportScoreProvider(retries=4, backoff_factor=0.5)
+
+        retries = provider.session.get_adapter("https://").max_retries
+
+        self.assertEqual(retries.total, 4)
+        self.assertEqual(retries.connect, 4)
+        self.assertEqual(retries.read, 4)
+        self.assertEqual(retries.status, 4)
+        self.assertEqual(retries.allowed_methods, frozenset({"GET"}))
+        self.assertEqual(retries.status_forcelist, RETRYABLE_STATUS_CODES)
+        self.assertEqual(retries.backoff_factor, 0.5)
+        self.assertTrue(retries.respect_retry_after_header)
+
     def test_team_endpoint_and_returned_slug_are_validated(self):
         provider = SportScoreProvider(base_url="https://sportscore.test")
         provider.session.get = Mock(return_value=Response({

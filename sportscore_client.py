@@ -10,6 +10,11 @@ from typing import Any
 from urllib.parse import urlparse
 
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
+
+RETRYABLE_STATUS_CODES = (429, 500, 502, 503, 504)
 
 
 def normalize(value: str) -> str:
@@ -82,11 +87,30 @@ def parse_match(payload: dict[str, Any]) -> SportScoreMatch:
 
 
 class SportScoreProvider:
-    def __init__(self, base_url: str = "https://sportscore.com", timeout: int = 10):
+    def __init__(
+        self,
+        base_url: str = "https://sportscore.com",
+        timeout: int = 10,
+        retries: int = 3,
+        backoff_factor: float = 1.0,
+    ):
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         self.session = requests.Session()
         self.session.headers.update({"Accept": "application/json", "User-Agent": "MatchCalendarSync/2.0"})
+        retry_policy = Retry(
+            total=retries,
+            connect=retries,
+            read=retries,
+            status=retries,
+            allowed_methods=frozenset({"GET"}),
+            status_forcelist=RETRYABLE_STATUS_CODES,
+            backoff_factor=backoff_factor,
+            respect_retry_after_header=True,
+        )
+        adapter = HTTPAdapter(max_retries=retry_policy)
+        self.session.mount("https://", adapter)
+        self.session.mount("http://", adapter)
 
     def _get(self, endpoint: str, slug: str, **extra: str) -> dict[str, Any]:
         response = self.session.get(
