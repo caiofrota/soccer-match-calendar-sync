@@ -17,7 +17,7 @@ sys.modules.setdefault("google.oauth2", oauth2)
 sys.modules.setdefault("googleapiclient", api)
 sys.modules.setdefault("googleapiclient.discovery", discovery)
 
-from crawler import Target, choose_existing, display_summary, event_body
+from crawler import Target, choose_existing, display_summary, event_body, should_create_event
 from sportscore_client import SportScoreMatch, normalize_status, parse_match
 
 
@@ -74,6 +74,17 @@ class CalendarReconciliationTests(unittest.TestCase):
 
     def test_missing_match_does_not_cancel_an_event(self):
         self.assertIsNone(choose_existing(match(), Target("team", "ceara"), []))
+
+    def test_does_not_create_past_final_or_scheduled_matches(self):
+        now = datetime(2026, 8, 20, tzinfo=timezone.utc)
+        self.assertFalse(should_create_event(match(status="final"), now))
+        self.assertFalse(should_create_event(match(status="scheduled"), now))
+
+    def test_keeps_actionable_past_statuses_visible(self):
+        now = datetime(2026, 8, 20, tzinfo=timezone.utc)
+        for status in ("live", "postponed", "canceled"):
+            with self.subTest(status=status):
+                self.assertTrue(should_create_event(match(status=status), now))
 
 
 if __name__ == "__main__":

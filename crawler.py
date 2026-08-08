@@ -108,6 +108,11 @@ def stable_ical_uid(match: SportScoreMatch, target: Target) -> str:
     return f"{hashlib.sha256(value).hexdigest()}@match-crawler"
 
 
+def should_create_event(match: SportScoreMatch, now: Optional[datetime] = None) -> bool:
+    now = now or datetime.now(timezone.utc)
+    return match.kickoff >= now or match.status in {"live", "postponed", "canceled"}
+
+
 def list_calendar_events(service, calendar_id: str) -> list[dict]:
     events: list[dict] = []
     page_token = None
@@ -180,6 +185,9 @@ def sync_to_google_calendar(target: Target, calendar_id: str) -> None:
     created = updated = 0
     for match in matches:
         existing = choose_existing(match, target, events)
+        if not existing and not should_create_event(match):
+            print(f"[GCAL][skipped-past] {display_summary(match)} — {match.kickoff.isoformat()}")
+            continue
         body = event_body(match, target)
         if existing:
             service.events().patch(
@@ -212,6 +220,8 @@ def generate_ics(target: Target, output_file: str) -> None:
         f"X-WR-TIMEZONE:{TIMEZONE}", f"X-WR-CALDESC:{ics_escape(CALDESC)}",
     ]
     for match in matches:
+        if not should_create_event(match):
+            continue
         start = match.kickoff.astimezone(timezone.utc)
         end = start + timedelta(hours=2)
         lines.extend([
