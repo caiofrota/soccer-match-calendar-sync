@@ -1,2 +1,4 @@
 credentials.json
 calendar.ics
+__pycache__/
+*.py[cod]

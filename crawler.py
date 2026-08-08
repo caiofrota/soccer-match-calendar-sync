@@ -1,291 +1,254 @@
 from __future__ import annotations
+
 import argparse
+import hashlib
 import os
-import re
-import requests
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
-from typing import Iterable, Optional
-from bs4 import BeautifulSoup
+from typing import Optional
+from zoneinfo import ZoneInfo
+
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
-DEFAULT_SOURCE = "https://www.placardefutebol.com.br/champions-league"
-PRODID = "//Caio Frota//Match Crawler v1.0//EN"
-CALNAME = "Match Crawler"
-CALDESC = "Match Crawler"
-TIMEZONE = "America/Fortaleza"
+from sportscore_client import SportScoreMatch, SportScoreProvider, normalize
 
+PRODID = "//Caio Frota//Match Crawler v2.0//EN"
+CALNAME = "Match Crawler"
+CALDESC = "Calendário de partidas fornecido por SportScore"
+TIMEZONE = "America/Fortaleza"
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 CREDENTIALS_FILE = "credentials.json"
+SPORTSCORE_URL = "https://sportscore.com"
 
-HTTP_TIMEOUT = 10  # segundos
 
-@dataclass
-class MatchDetails:
-    league: str
-    group: str
-    home: str
-    away: str
-    date_str: str
-    time_str: str
-    comments: str
-    location: str
+@dataclass(frozen=True)
+class Target:
+    kind: str
+    slug: str
 
     @property
-    def uid(self) -> str:
-        return f"{self.league}|{self.group}|{self.home}|{self.away}"
+    def key(self) -> str:
+        return f"{self.kind}:{self.slug}"
 
-def local_str_to_utc(date_str: str, time_str: str, fmt: str) -> str:
-    local_dt = datetime.strptime(f"{date_str} {time_str}", "%d/%m/%Y %H:%M")
-    utc_dt = local_dt + timedelta(hours=3)
-    return utc_dt.strftime(fmt)
-
-def fetch_html(url: str) -> BeautifulSoup:
-    resp = requests.get(
-        url,
-        timeout=HTTP_TIMEOUT,
-        headers={"User-Agent": "Mozilla/5.0 (MatchCrawler/1.0)"},
-    )
-    resp.raise_for_status()
-    return BeautifulSoup(resp.text, "lxml")
 
 def get_calendar_service():
     if not os.path.exists(CREDENTIALS_FILE):
-        raise FileNotFoundError(
-            f"Credentials file '{CREDENTIALS_FILE}' not found."
-        )
-
+        raise FileNotFoundError(f"Credentials file '{CREDENTIALS_FILE}' not found.")
     credentials = service_account.Credentials.from_service_account_file(
         CREDENTIALS_FILE, scopes=SCOPES
     )
     return build("calendar", "v3", credentials=credentials)
 
-def parse_match_page(url: str) -> MatchDetails:
-    soup = fetch_html(url)
 
-    league = (
-        soup.find("h2", {"class": "match__league-name"}).get_text(strip=True)
-        if soup.find("h2", {"class": "match__league-name"})
-        else ""
-    )
-
-    group_el = soup.find("p", {"class": "match-group"})
-    group = (
-        re.sub(r"\s+", " ", group_el.get_text().strip().replace("\n", ""))
-        if group_el
-        else ""
-    )
-
-    teams = soup.find_all("h4", {"class": "team_link"})
-    if len(teams) < 2:
-        raise ValueError(f"Não foi possível encontrar os times em {url}")
-
-    home = teams[0].get_text(strip=True)
-    away = teams[1].get_text(strip=True)
-
-    details_container = soup.find("div", {"class": "match-details"})
-    date_str = ""
-    time_str = ""
-    comments = ""
-    location = ""
-
-    if details_container:
-        for p in details_container.find_all("p"):
-            if p.find("img", title="Local da partida"):
-                location = p.get_text(strip=True)
-            if p.find("img", title="Transmissão"):
-                comments = p.get_text(strip=True)
-            if p.find("img", title="Data da partida"):
-                parts = p.get_text(strip=True).split(" às ")
-                if len(parts) == 2:
-                    date_str, time_str = parts
-
-    if not (date_str and time_str):
-        raise ValueError(f"Data/horário não encontrados em {url}")
-
-    return MatchDetails(
-        league=league,
-        group=group,
-        home=home,
-        away=away,
-        date_str=date_str,
-        time_str=time_str,
-        comments=comments,
-        location=location,
-    )
+def load_matches(target: Target) -> list[SportScoreMatch]:
+    provider = SportScoreProvider()
+    if target.kind == "team":
+        matches = provider.team_schedule(target.slug)
+    else:
+        matches = provider.competition_schedule(target.slug)
+    cutoff = datetime.now(timezone.utc) - timedelta(days=30)
+    return [match for match in matches if match.kickoff >= cutoff]
 
 
-def iter_match_links(list_url: str) -> Iterable[str]:
-    soup = fetch_html(list_url)
+def display_summary(match: SportScoreMatch) -> str:
+    prefix = {
+        "postponed": "ADIADO — nova data a definir — ",
+        "canceled": "CANCELADO — ",
+    }.get(match.status, "")
+    return f"{prefix}{match.home} x {match.away}"
 
-    matches_container = soup.find("div", {"id": "next_matches"}) or soup.find(
-        "div", {"id": "main"}
-    )
-    if not matches_container:
-        raise ValueError("It was not possible to find the matches container.")
 
-    for a in matches_container.find_all("a"):
-        classes = a.get("class") or []
-        if any(cls.startswith("match__") for cls in classes):
-            href = a.get("href")
-            if href:
-                yield href
+def description(match: SportScoreMatch) -> str:
+    lines = [match.competition]
+    if match.round_name:
+        lines.append(match.round_name)
+    if match.status == "postponed":
+        lines.extend(
+            [
+                "Partida adiada; a data exibida é o horário originalmente informado.",
+                "Aguardando divulgação da nova data.",
+            ]
+        )
+    elif match.status == "canceled":
+        lines.append("Partida cancelada pelo fornecedor.")
+    elif match.status_text:
+        lines.append(f"Status: {match.status_text}")
+    lines.extend([f"Partida: {SPORTSCORE_URL}{match.path}", "Dados por SportScore"])
+    return "\n".join(line for line in lines if line)
 
-def generate_ics(url: str, output_file: str = "calendar.ics") -> None:
-    with open(output_file, "w", encoding="utf-8") as f:
-        f.write("BEGIN:VCALENDAR\n")
-        f.write("VERSION:2.0\n")
-        f.write(f"PRODID:-{PRODID}\n")
-        f.write("CALSCALE:GREGORIAN\n")
-        f.write("METHOD:PUBLISH\n")
-        f.write(f"X-WR-CALNAME:{CALNAME}\n")
-        f.write(f"X-WR-TIMEZONE:{TIMEZONE}\n")
-        f.write(f"X-WR-CALDESC:{CALDESC}\n")
 
-        for match_url in iter_match_links(url):
-            try:
-                details = parse_match_page(match_url)
+def event_properties(match: SportScoreMatch, target: Target) -> dict[str, str]:
+    return {
+        "provider": "sportscore",
+        "target": target.key,
+        "matchSlug": match.slug,
+        "occurrence": match.occurrence_key,
+        "home": normalize(match.home),
+        "away": normalize(match.away),
+        "providerStatus": match.status,
+    }
 
-                start_utc = local_str_to_utc(
-                    details.date_str, details.time_str, "%Y%m%dT%H%M%SZ"
-                )
-                end_utc = (
-                    datetime.strptime(start_utc, "%Y%m%dT%H%M%SZ")
-                    + timedelta(hours=2)
-                ).strftime("%Y%m%dT%H%M%SZ")
 
-                now_utc = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+def event_body(match: SportScoreMatch, target: Target) -> dict:
+    start = match.kickoff.astimezone(timezone.utc)
+    end = start + timedelta(hours=2)
+    return {
+        "summary": display_summary(match),
+        "description": description(match),
+        "start": {"dateTime": start.isoformat(), "timeZone": TIMEZONE},
+        "end": {"dateTime": end.isoformat(), "timeZone": TIMEZONE},
+        "location": match.location,
+        "extendedProperties": {"private": event_properties(match, target)},
+    }
 
-                f.write("BEGIN:VEVENT\n")
-                f.write(f"DTSTART:{start_utc}\n")
-                f.write(f"DTEND:{end_utc}\n")
-                f.write(f"DTSTAMP:{now_utc}\n")
-                f.write(f"UID:{details.uid}\n")
-                f.write(f"CREATED:{now_utc}\n")
-                f.write(
-                    f"DESCRIPTION:{details.league} - {details.group}<br/>{details.comments}\n"
-                )
-                f.write(f"LAST-MODIFIED:{now_utc}\n")
-                f.write("SEQUENCE:0\n")
-                f.write("STATUS:CONFIRMED\n")
-                f.write(f"LOCATION:{details.location}\n")
-                f.write(f"SUMMARY:{details.home} x {details.away}\n")
-                f.write("TRANSP:OPAQUE\n")
-                f.write("END:VEVENT\n")
 
-                print(
-                    f"[ICS] {details.league} | {details.group} | "
-                    f"{details.home} x {details.away} - "
-                    f"{details.date_str} às {details.time_str} | {details.comments}"
-                )
-            except Exception as e:
-                print(f"[ICS] Fail processing {match_url}: {e}")
+def stable_ical_uid(match: SportScoreMatch, target: Target) -> str:
+    value = f"{target.key}|{match.occurrence_key}".encode()
+    return f"{hashlib.sha256(value).hexdigest()}@match-crawler"
 
-        f.write("END:VCALENDAR\n")
 
-def sync_to_google_calendar(url: str, calendar_id: str) -> None:
+def list_calendar_events(service, calendar_id: str) -> list[dict]:
+    events: list[dict] = []
+    page_token = None
+    while True:
+        response = (
+            service.events()
+            .list(
+                calendarId=calendar_id,
+                timeMin=(datetime.now(timezone.utc) - timedelta(days=400)).isoformat(),
+                timeMax=(datetime.now(timezone.utc) + timedelta(days=1100)).isoformat(),
+                singleEvents=True,
+                showDeleted=False,
+                pageToken=page_token,
+            )
+            .execute()
+        )
+        events.extend(response.get("items", []))
+        page_token = response.get("nextPageToken")
+        if not page_token:
+            return events
+
+
+def event_start(event: dict) -> Optional[datetime]:
+    value = (event.get("start") or {}).get("dateTime")
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def choose_existing(match: SportScoreMatch, target: Target, events: list[dict]) -> Optional[dict]:
+    exact: list[dict] = []
+    reschedule: list[dict] = []
+    legacy: list[dict] = []
+    expected_summary = normalize(f"{match.home} x {match.away}")
+    for event in events:
+        private = ((event.get("extendedProperties") or {}).get("private") or {})
+        if private.get("provider") == "sportscore" and private.get("target") == target.key:
+            if private.get("occurrence") == match.occurrence_key:
+                exact.append(event)
+            elif (
+                private.get("matchSlug") == match.slug
+                and private.get("home") == normalize(match.home)
+                and private.get("away") == normalize(match.away)
+            ):
+                previous = event_start(event)
+                old_status = private.get("providerStatus")
+                if old_status == "postponed" or (
+                    previous and abs((previous - match.kickoff).total_seconds()) <= 21 * 86400
+                ):
+                    reschedule.append(event)
+        elif normalize(str(event.get("summary") or "")) == expected_summary:
+            previous = event_start(event)
+            if previous and abs((previous - match.kickoff).total_seconds()) <= 60:
+                legacy.append(event)
+    for candidates in (exact, reschedule, legacy):
+        if len(candidates) == 1:
+            return candidates[0]
+        if len(candidates) > 1:
+            raise RuntimeError(f"Ambiguous calendar occurrence for {match.home} x {match.away}")
+    return None
+
+
+def sync_to_google_calendar(target: Target, calendar_id: str) -> None:
     service = get_calendar_service()
+    matches = load_matches(target)
+    events = list_calendar_events(service, calendar_id)
+    created = updated = 0
+    for match in matches:
+        existing = choose_existing(match, target, events)
+        body = event_body(match, target)
+        if existing:
+            service.events().patch(
+                calendarId=calendar_id, eventId=existing["id"], body=body
+            ).execute()
+            updated += 1
+            action = "updated"
+        else:
+            body["iCalUID"] = stable_ical_uid(match, target)
+            created_event = service.events().insert(
+                calendarId=calendar_id, body=body
+            ).execute()
+            events.append(created_event)
+            created += 1
+            action = "created"
+        print(f"[GCAL][{action}] {display_summary(match)} — {match.kickoff.isoformat()}")
+    print(f"[GCAL] target={target.key} matches={len(matches)} created={created} updated={updated}")
 
-    for match_url in iter_match_links(url):
-        try:
-            details = parse_match_page(match_url)
 
-            start_iso = local_str_to_utc(
-                details.date_str, details.time_str, "%Y-%m-%dT%H:%M:%S"
-            )
-            end_iso = (
-                datetime.strptime(start_iso, "%Y-%m-%dT%H:%M:%S")
-                + timedelta(hours=2)
-            ).strftime("%Y-%m-%dT%H:%M:%S")
+def ics_escape(value: str) -> str:
+    return value.replace("\\", "\\\\").replace("\n", "\\n").replace(",", "\\,").replace(";", "\\;")
 
-            start_dt = f"{start_iso}Z"
-            end_dt = f"{end_iso}Z"
 
-            ical_uid = details.uid
+def generate_ics(target: Target, output_file: str) -> None:
+    matches = load_matches(target)
+    now = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    lines = [
+        "BEGIN:VCALENDAR", "VERSION:2.0", f"PRODID:-{PRODID}",
+        "CALSCALE:GREGORIAN", "METHOD:PUBLISH", f"X-WR-CALNAME:{ics_escape(CALNAME)}",
+        f"X-WR-TIMEZONE:{TIMEZONE}", f"X-WR-CALDESC:{ics_escape(CALDESC)}",
+    ]
+    for match in matches:
+        start = match.kickoff.astimezone(timezone.utc)
+        end = start + timedelta(hours=2)
+        lines.extend([
+            "BEGIN:VEVENT", f"DTSTART:{start.strftime('%Y%m%dT%H%M%SZ')}",
+            f"DTEND:{end.strftime('%Y%m%dT%H%M%SZ')}", f"DTSTAMP:{now}",
+            f"UID:{stable_ical_uid(match, target)}", f"DESCRIPTION:{ics_escape(description(match))}",
+            f"LOCATION:{ics_escape(match.location)}", f"SUMMARY:{ics_escape(display_summary(match))}",
+            "STATUS:CONFIRMED", "TRANSP:OPAQUE", "END:VEVENT",
+        ])
+    lines.append("END:VCALENDAR")
+    with open(output_file, "w", encoding="utf-8", newline="") as output:
+        output.write("\r\n".join(lines) + "\r\n")
+    print(f"[ICS] target={target.key} matches={len(matches)} output={output_file}")
 
-            existing = (
-                service.events()
-                .list(calendarId=calendar_id, iCalUID=ical_uid, showDeleted=True)
-                .execute()
-                .get("items", [])
-            )
-
-            event_body = {
-                "summary": f"{details.home} x {details.away}",
-                "description": f"{details.league} - {details.group}<br/>{details.comments}",
-                "start": {"dateTime": start_dt, "timeZone": TIMEZONE},
-                "end": {"dateTime": end_dt, "timeZone": TIMEZONE},
-                "location": details.location,
-                "iCalUID": ical_uid,
-            }
-
-            if existing:
-                event_id = existing[0]["id"]
-                service.events().update(
-                    calendarId=calendar_id, eventId=event_id, body=event_body
-                ).execute()
-                status = "updated"
-            else:
-                service.events().insert(calendarId=calendar_id, body=event_body).execute()
-                status = "created"
-
-            print(
-                f"[GCAL][{status}] {details.league} | {details.group} | "
-                f"{details.home} x {details.away} - "
-                f"{details.date_str} às {details.time_str} | {details.comments}"
-            )
-        except Exception as e:
-            print(f"[GCAL] Fail processing {match_url}: {e}")
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        description="Web Soccer Match Crawler"
-    )
+    parser = argparse.ArgumentParser(description="SportScore soccer calendar crawler")
     subparsers = parser.add_subparsers(dest="command", required=True)
-
-    ics_parser = subparsers.add_parser("ics", help="Generate calendar.ics file.")
-    ics_parser.add_argument(
-        "--url",
-        "-u",
-        default=DEFAULT_SOURCE,
-        help=f"Source URL (default: {DEFAULT_SOURCE})",
-    )
-    ics_parser.add_argument(
-        "--output",
-        "-o",
-        default="calendar.ics",
-        help="Name of the output ICS file (default: calendar.ics)",
-    )
-
-    gcal_parser = subparsers.add_parser(
-        "gcalendar", help="Sync events with Google Calendar"
-    )
-    gcal_parser.add_argument(
-        "--url",
-        "-u",
-        default=DEFAULT_SOURCE,
-        help=f"Source URL (default: {DEFAULT_SOURCE})",
-    )
-    gcal_parser.add_argument(
-        "--calendar-id",
-        "-c",
-        required=True,
-        help="ID of the Google Calendar (ex.: something@group.calendar.google.com)",
-    )
-
+    for command in ("ics", "gcalendar"):
+        child = subparsers.add_parser(command)
+        child.add_argument("--target-type", choices=("team", "competition"), required=True)
+        child.add_argument("--slug", required=True)
+        if command == "ics":
+            child.add_argument("--output", "-o", default="calendar.ics")
+        else:
+            child.add_argument("--calendar-id", "-c", required=True)
     return parser
 
-def main(argv: Optional[list[str]] = None) -> None:
-    parser = build_parser()
-    args = parser.parse_args(argv)
 
+def main(argv: Optional[list[str]] = None) -> None:
+    args = build_parser().parse_args(argv)
+    target = Target(args.target_type, args.slug)
     if args.command == "ics":
-        generate_ics(args.url, args.output)
-    elif args.command == "gcalendar":
-        sync_to_google_calendar(args.url, args.calendar_id)
+        generate_ics(target, args.output)
     else:
-        parser.print_help()
+        sync_to_google_calendar(target, args.calendar_id)
+
 
 if __name__ == "__main__":
     main()
