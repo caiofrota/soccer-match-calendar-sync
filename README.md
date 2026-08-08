@@ -58,15 +58,23 @@ python crawler.py ics \
 | Copa do Mundo feminina | competição | `fifa-womens-world-cup` |
 | Brasil feminino | time | `brazil-women` |
 
-Os sete calendários anteriores conservam seus IDs. Para habilitar os dois novos, crie os calendários,
-compartilhe-os com a conta de serviço e configure estas variáveis em
+Cada calendário usa uma variável em
 `Settings > Secrets and variables > Actions > Variables`:
 
+- `GOOGLE_CALENDAR_ID_CHAMPIONS_LEAGUE`
+- `GOOGLE_CALENDAR_ID_COPA_AMERICA`
+- `GOOGLE_CALENDAR_ID_EUROCOPA`
+- `GOOGLE_CALENDAR_ID_ENGLISH_LEAGUE_CUP`
+- `GOOGLE_CALENDAR_ID_CEARA`
+- `GOOGLE_CALENDAR_ID_BRAZIL`
+- `GOOGLE_CALENDAR_ID_WORLD_CUP`
 - `GOOGLE_CALENDAR_ID_WOMENS_WORLD_CUP`
 - `GOOGLE_CALENDAR_ID_BRAZIL_WOMEN`
 
-Sem essas variáveis, os dois jobs são ignorados de forma segura. O SportScore já reconhece a Copa do
-Mundo Feminina, mas só publicará jogos de 2027 quando a programação estiver disponível no provedor.
+As sete variáveis dos calendários anteriores já estão configuradas. Para habilitar os dois novos,
+crie os calendários, compartilhe-os com a conta de serviço e configure as duas últimas variáveis.
+Sem elas, somente esses dois jobs são ignorados. O SportScore já reconhece a Copa do Mundo Feminina,
+mas só publicará jogos de 2027 quando a programação estiver disponível no provedor.
 
 ## Automação
 

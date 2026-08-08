@@ -17,31 +17,31 @@ jobs:
           - name: champions-league
             type: competition
             slug: uefa-champions-league
-            calendar_id: "401be6a3ffc7a181b7569f3dfa362cd7bf797ac26d05f5b49ec3e8043a42bad8@group.calendar.google.com"
+            calendar_id: ${{ vars.GOOGLE_CALENDAR_ID_CHAMPIONS_LEAGUE }}
           - name: copa-america
             type: competition
             slug: conmebol-copa-america
-            calendar_id: "fe1896bb7a29bfc75ceef4e36c22187fa0b3ccb3a60c7275f07bc7dc8b498531@group.calendar.google.com"
+            calendar_id: ${{ vars.GOOGLE_CALENDAR_ID_COPA_AMERICA }}
           - name: eurocopa
             type: competition
             slug: uefa-european-championship
-            calendar_id: "6c59ceb5c9d3c0d508a7c365fac106b18a2b1f5e8cf61f256b38b19e8c206dc1@group.calendar.google.com"
+            calendar_id: ${{ vars.GOOGLE_CALENDAR_ID_EUROCOPA }}
           - name: copa-da-liga-inglesa
             type: competition
             slug: english-football-league-cup
-            calendar_id: "28df770f8678c4f6890da87576397504c150669c30d8e2ed6d23fd0262a441a7@group.calendar.google.com"
+            calendar_id: ${{ vars.GOOGLE_CALENDAR_ID_ENGLISH_LEAGUE_CUP }}
           - name: ceara
             type: team
             slug: ceara
-            calendar_id: "2229d57329c1589bf08b9a2752fc29be6fcb7139409a300fb9bd63f866d24a60@group.calendar.google.com"
+            calendar_id: ${{ vars.GOOGLE_CALENDAR_ID_CEARA }}
           - name: brasil
             type: team
             slug: brazil
-            calendar_id: "5e4c412c5caba27497079e63dd4f54b4eb50f6dafe409a07a58ec63069199558@group.calendar.google.com"
+            calendar_id: ${{ vars.GOOGLE_CALENDAR_ID_BRAZIL }}
           - name: copa-do-mundo
             type: competition
             slug: fifa-world-cup
-            calendar_id: "055de4983aede32a642bd40331aeffaa1bf2c0f2e65919a432499464f24f28c0@group.calendar.google.com"
+            calendar_id: ${{ vars.GOOGLE_CALENDAR_ID_WORLD_CUP }}
           - name: copa-do-mundo-feminina
             type: competition
             slug: fifa-womens-world-cup
