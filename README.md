@@ -88,7 +88,12 @@ horário durante períodos de alta demanda do GitHub.
 python -m unittest -v
 ```
 
+## Créditos
+
+Os dados de partidas, competições, times, horários e status utilizados por este projeto são
+fornecidos pelo [SportScore](https://sportscore.com/). A disponibilidade e a atualização dessas
+informações dependem do provedor.
+
 ## Licença
 
-MIT. Os dados esportivos são fornecidos pelo SportScore e estão sujeitos à disponibilidade e às
-condições do provedor.
+MIT.
