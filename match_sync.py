@@ -14,11 +14,12 @@ from sportscore_client import SportScoreMatch, SportScoreProvider, normalize
 
 PRODID = "//Caio Frota//Match Calendar Sync v2.0//EN"
 CALNAME = "Soccer Match Calendar Sync"
-CALDESC = "Calendário de partidas fornecido por SportScore"
+CALDESC = "Calendário comunitário não oficial. Dados por SportScore: https://sportscore.com/"
 TIMEZONE = "America/Fortaleza"
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 CREDENTIALS_FILE = "credentials.json"
 SPORTSCORE_URL = "https://sportscore.com"
+SPORTSCORE_ATTRIBUTION = f"Dados por SportScore: {SPORTSCORE_URL}/"
 
 
 @dataclass(frozen=True)
@@ -73,7 +74,7 @@ def description(match: SportScoreMatch) -> str:
         lines.append("Partida cancelada pelo fornecedor.")
     elif match.status_text:
         lines.append(f"Status: {match.status_text}")
-    lines.extend([f"Partida: {SPORTSCORE_URL}{match.path}", "Dados por SportScore"])
+    lines.extend([f"Partida: {SPORTSCORE_URL}{match.path}", SPORTSCORE_ATTRIBUTION])
     return "\n".join(line for line in lines if line)
 
 
