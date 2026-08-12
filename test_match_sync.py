@@ -17,7 +17,14 @@ sys.modules.setdefault("google.oauth2", oauth2)
 sys.modules.setdefault("googleapiclient", api)
 sys.modules.setdefault("googleapiclient.discovery", discovery)
 
-from match_sync import Target, choose_existing, display_summary, event_body, should_create_event
+from match_sync import (
+    Target,
+    choose_existing,
+    description,
+    display_summary,
+    event_body,
+    should_create_event,
+)
 from sportscore_client import SportScoreMatch, normalize_status, parse_match
 
 
@@ -70,6 +77,9 @@ class CalendarReconciliationTests(unittest.TestCase):
 
     def test_canceled_match_stays_visible(self):
         self.assertTrue(display_summary(match(status="canceled")).startswith("CANCELADO"))
+
+    def test_event_credits_the_data_provider_with_a_link(self):
+        self.assertIn("Dados por SportScore: https://sportscore.com/", description(match()))
 
     def test_reschedule_reuses_one_existing_event(self):
         old = match(status="postponed")
