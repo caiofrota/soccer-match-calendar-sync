@@ -13,7 +13,6 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-
 RETRYABLE_STATUS_CODES = (429, 500, 502, 503, 504)
 
 
@@ -31,7 +30,9 @@ def normalize_status(status: str, text: str = "") -> str:
         return "postponed"
     if re.search(r"finish|full time|after extra time|after penalt|shootout|\baet\b|\bft\b", value):
         return "final"
-    if re.search(r"\blive\b|in play|in progress|half time|first half|second half|paused|\bht\b", value):
+    if re.search(
+        r"\blive\b|in play|in progress|half time|first half|second half|paused|\bht\b", value
+    ):
         return "live"
     return "scheduled"
 
@@ -51,7 +52,9 @@ class SportScoreMatch:
 
     @property
     def occurrence_key(self) -> str:
-        return f"{self.slug}|{normalize(self.home)}|{normalize(self.away)}|{self.kickoff.isoformat()}"
+        return (
+            f"{self.slug}|{normalize(self.home)}|{normalize(self.away)}|{self.kickoff.isoformat()}"
+        )
 
 
 def parse_match(payload: dict[str, Any]) -> SportScoreMatch:
@@ -97,7 +100,9 @@ class SportScoreProvider:
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         self.session = requests.Session()
-        self.session.headers.update({"Accept": "application/json", "User-Agent": "MatchCalendarSync/2.0"})
+        self.session.headers.update(
+            {"Accept": "application/json", "User-Agent": "MatchCalendarSync/2.0"}
+        )
         retry_policy = Retry(
             total=retries,
             connect=retries,
@@ -144,7 +149,11 @@ class SportScoreProvider:
                 raise ValueError(f'SportScore returned competition "{returned}" for "{slug}"')
             names.add(normalize(str(standings.get("competition") or "")))
             for table in standings.get("tables") or []:
-                teams.update(str(row["team_slug"]).lower() for row in table.get("rows") or [] if row.get("team_slug"))
+                teams.update(
+                    str(row["team_slug"]).lower()
+                    for row in table.get("rows") or []
+                    if row.get("team_slug")
+                )
         except (requests.RequestException, ValueError) as error:
             errors.append(str(error))
         try:

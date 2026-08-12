@@ -6,7 +6,6 @@ import os
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Optional
-from zoneinfo import ZoneInfo
 
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -151,7 +150,7 @@ def choose_existing(match: SportScoreMatch, target: Target, events: list[dict]) 
     legacy: list[dict] = []
     expected_summary = normalize(f"{match.home} x {match.away}")
     for event in events:
-        private = ((event.get("extendedProperties") or {}).get("private") or {})
+        private = (event.get("extendedProperties") or {}).get("private") or {}
         if private.get("provider") == "sportscore" and private.get("target") == target.key:
             if private.get("occurrence") == match.occurrence_key:
                 exact.append(event)
@@ -197,9 +196,7 @@ def sync_to_google_calendar(target: Target, calendar_id: str) -> None:
             action = "updated"
         else:
             body["iCalUID"] = stable_ical_uid(match, target)
-            created_event = service.events().insert(
-                calendarId=calendar_id, body=body
-            ).execute()
+            created_event = service.events().insert(calendarId=calendar_id, body=body).execute()
             events.append(created_event)
             created += 1
             action = "created"
@@ -215,22 +212,35 @@ def generate_ics(target: Target, output_file: str) -> None:
     matches = load_matches(target)
     now = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     lines = [
-        "BEGIN:VCALENDAR", "VERSION:2.0", f"PRODID:-{PRODID}",
-        "CALSCALE:GREGORIAN", "METHOD:PUBLISH", f"X-WR-CALNAME:{ics_escape(CALNAME)}",
-        f"X-WR-TIMEZONE:{TIMEZONE}", f"X-WR-CALDESC:{ics_escape(CALDESC)}",
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        f"PRODID:-{PRODID}",
+        "CALSCALE:GREGORIAN",
+        "METHOD:PUBLISH",
+        f"X-WR-CALNAME:{ics_escape(CALNAME)}",
+        f"X-WR-TIMEZONE:{TIMEZONE}",
+        f"X-WR-CALDESC:{ics_escape(CALDESC)}",
     ]
     for match in matches:
         if not should_create_event(match):
             continue
         start = match.kickoff.astimezone(timezone.utc)
         end = start + timedelta(hours=2)
-        lines.extend([
-            "BEGIN:VEVENT", f"DTSTART:{start.strftime('%Y%m%dT%H%M%SZ')}",
-            f"DTEND:{end.strftime('%Y%m%dT%H%M%SZ')}", f"DTSTAMP:{now}",
-            f"UID:{stable_ical_uid(match, target)}", f"DESCRIPTION:{ics_escape(description(match))}",
-            f"LOCATION:{ics_escape(match.location)}", f"SUMMARY:{ics_escape(display_summary(match))}",
-            "STATUS:CONFIRMED", "TRANSP:OPAQUE", "END:VEVENT",
-        ])
+        lines.extend(
+            [
+                "BEGIN:VEVENT",
+                f"DTSTART:{start.strftime('%Y%m%dT%H%M%SZ')}",
+                f"DTEND:{end.strftime('%Y%m%dT%H%M%SZ')}",
+                f"DTSTAMP:{now}",
+                f"UID:{stable_ical_uid(match, target)}",
+                f"DESCRIPTION:{ics_escape(description(match))}",
+                f"LOCATION:{ics_escape(match.location)}",
+                f"SUMMARY:{ics_escape(display_summary(match))}",
+                "STATUS:CONFIRMED",
+                "TRANSP:OPAQUE",
+                "END:VEVENT",
+            ]
+        )
     lines.append("END:VCALENDAR")
     with open(output_file, "w", encoding="utf-8", newline="") as output:
         output.write("\r\n".join(lines) + "\r\n")
