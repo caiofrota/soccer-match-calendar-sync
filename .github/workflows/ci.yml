@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   required:
-    name: required
+    name: CI / required
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
