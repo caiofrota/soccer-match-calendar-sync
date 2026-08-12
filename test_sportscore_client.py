@@ -43,9 +43,9 @@ class ProviderContractTests(unittest.TestCase):
 
     def test_team_endpoint_and_returned_slug_are_validated(self):
         provider = SportScoreProvider(base_url="https://sportscore.test")
-        provider.session.get = Mock(return_value=Response({
-            "team": {"slug": "brazil-women"}, "matches": [fixture()]
-        }))
+        provider.session.get = Mock(
+            return_value=Response({"team": {"slug": "brazil-women"}, "matches": [fixture()]})
+        )
 
         matches = provider.team_schedule("brazil-women")
 
@@ -58,9 +58,9 @@ class ProviderContractTests(unittest.TestCase):
 
     def test_rejects_provider_fuzzy_match_for_wrong_team(self):
         provider = SportScoreProvider()
-        provider.session.get = Mock(return_value=Response({
-            "team": {"slug": "brazil"}, "matches": []
-        }))
+        provider.session.get = Mock(
+            return_value=Response({"team": {"slug": "brazil"}, "matches": []})
+        )
         with self.assertRaisesRegex(ValueError, "returned"):
             provider.team_schedule("brazil-w")
 
@@ -69,13 +69,15 @@ class ProviderContractTests(unittest.TestCase):
 
         def get(_url, params, timeout):
             if "standings" in _url:
-                return Response({
-                    "competition": "FIFA Women's World Cup",
-                    "competition_slug": "fifa-womens-world-cup",
-                    "tables": [{"rows": [
-                        {"team_slug": "brazil-women"}, {"team_slug": "france-women"}
-                    ]}],
-                })
+                return Response(
+                    {
+                        "competition": "FIFA Women's World Cup",
+                        "competition_slug": "fifa-womens-world-cup",
+                        "tables": [
+                            {"rows": [{"team_slug": "brazil-women"}, {"team_slug": "france-women"}]}
+                        ],
+                    }
+                )
             if "bracket" in _url:
                 return Response({"competition": "FIFA Women's World Cup", "rounds": []})
             return Response({"team": {"slug": params["slug"]}, "matches": [fixture()]})

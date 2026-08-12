@@ -23,22 +23,22 @@ uma competição por sua classificação, chaveamento e agendas dos participante
 ## Instalação e uso
 
 ```bash
-pip install -r requirements.txt
+uv sync --locked
 
 # Agenda de um time
-python match_sync.py gcalendar \
+uv run python match_sync.py gcalendar \
   --target-type team \
   --slug ceara \
   --calendar-id "seu-calendario@group.calendar.google.com"
 
 # Partidas de uma competição
-python match_sync.py gcalendar \
+uv run python match_sync.py gcalendar \
   --target-type competition \
   --slug fifa-world-cup \
   --calendar-id "seu-calendario@group.calendar.google.com"
 
 # Arquivo ICS
-python match_sync.py ics \
+uv run python match_sync.py ics \
   --target-type team \
   --slug brazil-women \
   --output calendar.ics
@@ -85,8 +85,21 @@ horário durante períodos de alta demanda do GitHub.
 ## Testes
 
 ```bash
-python -m unittest -v
+uv run python -m unittest -v
 ```
+
+## CI/CD
+
+O repositório é um único worker/CLI Python 3.11. O check obrigatório `CI / required` valida o
+lockfile, formatação, lint, tipos, sintaxe, testes e segurança dos workflows em pull requests, pushes
+para `main` e execuções manuais. Ele não recebe segredos nem altera calendários.
+
+O workflow agendado existente é a entrega operacional: usa credenciais de produção para atualizar
+os calendários duas vezes ao dia. Build, publicação de pacote, banco de dados, browser, mobile e
+monorepo não se aplicam. Testes contra SportScore e Google Calendar reais ficam fora do check porque
+dependem de serviços externos ou de produção; a suíte obrigatória usa mocks e contratos
+determinísticos. As razões, limites e condição de revisão estão registradas em
+[`docs/decisions/0001-ci-cd.md`](docs/decisions/0001-ci-cd.md).
 
 ## Créditos
 

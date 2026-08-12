@@ -45,11 +45,16 @@ class SportScoreParsingTests(unittest.TestCase):
         self.assertEqual(normalize_status("canceled"), "canceled")
 
     def test_parses_timezone_and_round(self):
-        parsed = parse_match({
-            "home": "Ceará", "away": "Fortaleza",
-            "time": "2026-08-10T23:30:00+00:00", "status": "upcoming",
-            "round": 19, "url": "/football/match/ceara-vs-fortaleza/",
-        })
+        parsed = parse_match(
+            {
+                "home": "Ceará",
+                "away": "Fortaleza",
+                "time": "2026-08-10T23:30:00+00:00",
+                "status": "upcoming",
+                "round": 19,
+                "url": "/football/match/ceara-vs-fortaleza/",
+            }
+        )
         self.assertEqual(parsed.slug, "ceara-vs-fortaleza")
         self.assertEqual(parsed.round_name, "Rodada 19")
         self.assertIsNotNone(parsed.kickoff.tzinfo)
@@ -59,7 +64,9 @@ class CalendarReconciliationTests(unittest.TestCase):
     def test_postponed_match_stays_visible(self):
         postponed = match(status="postponed")
         self.assertTrue(display_summary(postponed).startswith("ADIADO"))
-        self.assertIn("horário originalmente", event_body(postponed, Target("team", "ceara"))["description"])
+        self.assertIn(
+            "horário originalmente", event_body(postponed, Target("team", "ceara"))["description"]
+        )
 
     def test_canceled_match_stays_visible(self):
         self.assertTrue(display_summary(match(status="canceled")).startswith("CANCELADO"))

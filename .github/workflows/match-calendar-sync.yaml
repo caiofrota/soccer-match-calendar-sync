@@ -5,6 +5,13 @@ on:
     - cron: "0 8,20 * * *"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: soccer-match-calendar-sync
+  cancel-in-progress: false
+
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -53,16 +60,24 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: "3.11"
-          cache: pip
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      - name: Set up uv
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          version: "0.12.3"
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Install locked runtime dependencies
+        run: uv sync --locked --no-dev
 
       - name: Create credentials.json from secret
         if: matrix.target.calendar_id != ''
@@ -82,12 +97,18 @@ jobs:
 
       - name: Sync calendar for ${{ matrix.target.name }}
         if: matrix.target.calendar_id != ''
+        env:
+          CALENDAR_ID: ${{ matrix.target.calendar_id }}
+          TARGET_SLUG: ${{ matrix.target.slug }}
+          TARGET_TYPE: ${{ matrix.target.type }}
         run: |
-          python match_sync.py gcalendar \
-            --target-type "${{ matrix.target.type }}" \
-            --slug "${{ matrix.target.slug }}" \
-            --calendar-id "${{ matrix.target.calendar_id }}"
+          uv run --locked --no-dev python match_sync.py gcalendar \
+            --target-type "$TARGET_TYPE" \
+            --slug "$TARGET_SLUG" \
+            --calendar-id "$CALENDAR_ID"
 
       - name: Report missing optional calendar
         if: matrix.target.calendar_id == ''
-        run: echo "Skipping ${{ matrix.target.name }} because its repository variable is not configured."
+        env:
+          TARGET_NAME: ${{ matrix.target.name }}
+        run: echo "Skipping $TARGET_NAME because its repository variable is not configured."
