@@ -37,7 +37,7 @@ jobs:
         with:
           advanced-security: false
           annotations: true
-          collect: workflows
+          collect: workflows-only
           online-audits: false
           version: 1.14.2
 
