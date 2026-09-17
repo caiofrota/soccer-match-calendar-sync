@@ -113,6 +113,7 @@ mas só publicará jogos de 2027 quando a programação estiver disponível no p
 O workflow executa às `08:00` e `20:00` UTC (`05:00` e `17:00` em Fortaleza). Também pode ser
 executado manualmente pela aba Actions. Workflows agendados podem iniciar alguns minutos depois do
 horário durante períodos de alta demanda do GitHub.
+Até dois calendários são processados simultaneamente para reduzir a carga na API pública.
 
 Para validar o acesso ao SportScore no próprio runner sem credenciais nem alterações no Google
 Calendar, execute o workflow manualmente com **dry_run** habilitado. Os nove alvos são consultados
