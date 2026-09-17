@@ -71,6 +71,37 @@ jobs:
       - name: Run tests
         run: uv run --locked python -m unittest -v
 
+      - name: Diagnose public provider access
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          uv run --locked python - <<'PY'
+          import requests
+
+          agents = {
+              "current": "MatchCalendarSync/2.0",
+              "identified": (
+                  "Mozilla/5.0 (compatible; MatchCalendarSync/2.0; "
+                  "+https://github.com/caiofrota/soccer-match-calendar-sync)"
+              ),
+              "browser": (
+                  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                  "(KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+              ),
+          }
+          for label, agent in agents.items():
+              response = requests.get(
+                  "https://sportscore.com/api/widget/team/",
+                  params={"sport": "football", "slug": "ceara", "limit": "30"},
+                  headers={"Accept": "application/json", "User-Agent": agent},
+                  timeout=20,
+              )
+              print(label, response.status_code, {
+                  key: response.headers.get(key)
+                  for key in ("Content-Type", "Server", "CF-Ray", "CF-Mitigated", "Retry-After")
+              })
+              print(response.text[:500])
+          PY
+
       - name: Record validation
         env:
           CI_EVENT_NAME: ${{ github.event_name }}
