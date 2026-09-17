@@ -74,8 +74,9 @@ jobs:
       - name: Diagnose public provider access
         if: github.event_name == 'workflow_dispatch'
         run: |
-          uv run --locked python - <<'PY'
+          uv run --locked --with 'curl-cffi>=0.13,<1' python - <<'PY'
           import requests
+          from curl_cffi import requests as browser_requests
 
           agents = {
               "current": "MatchCalendarSync/2.0",
@@ -96,6 +97,18 @@ jobs:
                   timeout=20,
               )
               print(label, response.status_code, {
+                  key: response.headers.get(key)
+                  for key in ("Content-Type", "Server", "CF-Ray", "CF-Mitigated", "Retry-After")
+              })
+              print(response.text[:500])
+          for browser in ("chrome", "safari"):
+              response = browser_requests.get(
+                  "https://sportscore.com/api/widget/team/",
+                  params={"sport": "football", "slug": "ceara", "limit": "30"},
+                  impersonate=browser,
+                  timeout=20,
+              )
+              print("transport", browser, response.status_code, {
                   key: response.headers.get(key)
                   for key in ("Content-Type", "Server", "CF-Ray", "CF-Mitigated", "Retry-After")
               })
