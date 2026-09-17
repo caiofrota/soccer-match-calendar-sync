@@ -9,8 +9,9 @@ from datetime import datetime
 from typing import Any
 from urllib.parse import urlparse
 
-import requests
-from requests.adapters import HTTPAdapter
+from curl_cffi import requests
+from curl_cffi.requests.exceptions import HTTPError, RequestException
+from urllib3.response import HTTPResponse
 from urllib3.util.retry import Retry
 
 RETRYABLE_STATUS_CODES = (429, 500, 502, 503, 504)
@@ -99,11 +100,14 @@ class SportScoreProvider:
     ):
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
-        self.session = requests.Session()
-        self.session.headers.update(
-            {"Accept": "application/json", "User-Agent": "MatchCalendarSync/2.0"}
+        if retries < 0:
+            raise ValueError("retries must be non-negative")
+        # SportScore challenges the TLS/HTTP fingerprint of plain requests on GitHub runners.
+        # Keep browser headers and transport consistent; changing User-Agent alone is insufficient.
+        self.session: requests.Session[requests.Response] = requests.Session(
+            impersonate="chrome", headers={"Accept": "application/json"}, retry=0
         )
-        retry_policy = Retry(
+        self.retry_policy = Retry(
             total=retries,
             connect=retries,
             read=retries,
@@ -113,16 +117,43 @@ class SportScoreProvider:
             backoff_factor=backoff_factor,
             respect_retry_after_header=True,
         )
-        adapter = HTTPAdapter(max_retries=retry_policy)
-        self.session.mount("https://", adapter)
-        self.session.mount("http://", adapter)
 
     def _get(self, endpoint: str, slug: str, **extra: str) -> dict[str, Any]:
-        response = self.session.get(
-            f"{self.base_url}/api/widget/{endpoint}/",
-            params={"sport": "football", "slug": slug, **extra},
-            timeout=self.timeout,
-        )
+        url = f"{self.base_url}/api/widget/{endpoint}/"
+        retry = self.retry_policy
+        while True:
+            try:
+                response = self.session.get(
+                    url,
+                    params={"sport": "football", "slug": slug, **extra},
+                    timeout=self.timeout,
+                )
+            except RequestException:
+                if retry.total == 0:
+                    raise
+                retry = retry.increment(method="GET", url=url)
+                retry.sleep()
+                continue
+            retry_response = HTTPResponse(
+                status=response.status_code,
+                headers={
+                    key: value for key, value in response.headers.items() if value is not None
+                },
+            )
+            if retry.total == 0 or not retry.is_retry(
+                "GET", response.status_code, has_retry_after="Retry-After" in response.headers
+            ):
+                break
+            retry = retry.increment(method="GET", url=url, response=retry_response)
+            retry.sleep(retry_response)
+        if response.headers.get("CF-Mitigated") == "challenge":
+            ray = response.headers.get("CF-Ray", "unknown")
+            raise HTTPError(
+                f"SportScore returned a Cloudflare browser challenge for {url} "
+                f"(HTTP {response.status_code}, CF-Ray: {ray}). "
+                "No fixture data was received; check provider access before retrying the sync.",
+                response=response,
+            )
         response.raise_for_status()
         payload = response.json()
         if not isinstance(payload, dict):
@@ -154,7 +185,7 @@ class SportScoreProvider:
                     for row in table.get("rows") or []
                     if row.get("team_slug")
                 )
-        except (requests.RequestException, ValueError) as error:
+        except (RequestException, ValueError) as error:
             errors.append(str(error))
         try:
             bracket = self._get("bracket", slug)
@@ -164,7 +195,7 @@ class SportScoreProvider:
                     for side in ("home", "away"):
                         if match.get(side):
                             teams.add(normalize(str(match[side])).replace(" ", "-"))
-        except (requests.RequestException, ValueError) as error:
+        except (RequestException, ValueError) as error:
             errors.append(str(error))
         names.discard("")
         if not teams:
@@ -179,7 +210,7 @@ class SportScoreProvider:
                 for match in matches:
                     if normalize(match.competition) in names:
                         found.setdefault(match.occurrence_key, match)
-            except (requests.RequestException, ValueError) as error:
+            except (RequestException, ValueError) as error:
                 schedule_errors.append(f"{team}: {error}")
         if not successful:
             raise RuntimeError("Every team schedule failed: " + "; ".join(schedule_errors))
