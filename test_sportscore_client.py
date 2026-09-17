@@ -13,6 +13,7 @@ class Response(requests.Response):
         super().__init__()
         self.content = json.dumps(payload).encode()
         self.status_code = status
+        self.ok = 200 <= status < 400
         self.headers = requests.Headers(headers or {"Content-Type": "application/json"})
 
 
