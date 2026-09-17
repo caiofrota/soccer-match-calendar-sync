@@ -114,6 +114,17 @@ O workflow executa às `08:00` e `20:00` UTC (`05:00` e `17:00` em Fortaleza). T
 executado manualmente pela aba Actions. Workflows agendados podem iniciar alguns minutos depois do
 horário durante períodos de alta demanda do GitHub.
 
+Para validar o acesso ao SportScore no próprio runner sem credenciais nem alterações no Google
+Calendar, execute o workflow manualmente com **dry_run** habilitado. Os nove alvos são consultados
+e geram arquivos ICS temporários; erros do provedor continuam fazendo o job falhar.
+
+O cliente usa `curl_cffi` com transporte e cabeçalhos compatíveis com Chrome. Desde 9 de setembro
+de 2026, o Cloudflare do SportScore responde às requisições do cliente `requests` nos runners do
+GitHub com `403` e `CF-Mitigated: challenge`; trocar somente o `User-Agent` não resolve. O transporte
+foi validado no mesmo ambiente. Falhas de conexão, `429` e erros temporários do servidor mantêm
+tentativas limitadas com backoff e respeito ao `Retry-After`. Se um desafio persistir, o erro inclui
+o identificador `CF-Ray` para diagnóstico e a sincronização falha antes de alterar eventos.
+
 ## Testes
 
 ```bash

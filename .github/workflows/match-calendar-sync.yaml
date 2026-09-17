@@ -4,6 +4,12 @@ on:
   schedule:
     - cron: "0 8,20 * * *"
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Validate all SportScore targets by generating ICS files without accessing Google Calendar
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: read
@@ -80,7 +86,7 @@ jobs:
         run: uv sync --locked --no-dev
 
       - name: Create credentials.json from secret
-        if: matrix.target.calendar_id != ''
+        if: matrix.target.calendar_id != '' && !inputs.dry_run
         env:
           GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
         run: |
@@ -96,7 +102,7 @@ jobs:
           PY
 
       - name: Sync calendar for ${{ matrix.target.name }}
-        if: matrix.target.calendar_id != ''
+        if: matrix.target.calendar_id != '' && !inputs.dry_run
         env:
           CALENDAR_ID: ${{ matrix.target.calendar_id }}
           TARGET_SLUG: ${{ matrix.target.slug }}
@@ -107,8 +113,19 @@ jobs:
             --slug "$TARGET_SLUG" \
             --calendar-id "$CALENDAR_ID"
 
+      - name: Validate SportScore data for ${{ matrix.target.name }}
+        if: inputs.dry_run
+        env:
+          TARGET_SLUG: ${{ matrix.target.slug }}
+          TARGET_TYPE: ${{ matrix.target.type }}
+        run: |
+          uv run --locked --no-dev python match_sync.py ics \
+            --target-type "$TARGET_TYPE" \
+            --slug "$TARGET_SLUG" \
+            --output "$RUNNER_TEMP/calendar.ics"
+
       - name: Report missing optional calendar
-        if: matrix.target.calendar_id == ''
+        if: matrix.target.calendar_id == '' && !inputs.dry_run
         env:
           TARGET_NAME: ${{ matrix.target.name }}
         run: echo "Skipping $TARGET_NAME because its repository variable is not configured."
