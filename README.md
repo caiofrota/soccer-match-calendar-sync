@@ -19,17 +19,17 @@ Estes são calendários comunitários e não oficiais, atualizados automaticamen
 [SportScore](https://sportscore.com/). Datas e horários podem mudar; confirme informações críticas
 nos organizadores oficiais.
 
-| Calendário | Google Calendar | Apple Calendar, Outlook e outros |
-| --- | --- | --- |
-| Champions League | [Adicionar](https://calendar.google.com/calendar/u/0/r?cid=401be6a3ffc7a181b7569f3dfa362cd7bf797ac26d05f5b49ec3e8043a42bad8%40group.calendar.google.com) | [Endereço iCal](https://calendar.google.com/calendar/ical/401be6a3ffc7a181b7569f3dfa362cd7bf797ac26d05f5b49ec3e8043a42bad8%40group.calendar.google.com/public/basic.ics) |
-| Copa América | [Adicionar](https://calendar.google.com/calendar/u/0/r?cid=fe1896bb7a29bfc75ceef4e36c22187fa0b3ccb3a60c7275f07bc7dc8b498531%40group.calendar.google.com) | [Endereço iCal](https://calendar.google.com/calendar/ical/fe1896bb7a29bfc75ceef4e36c22187fa0b3ccb3a60c7275f07bc7dc8b498531%40group.calendar.google.com/public/basic.ics) |
-| Eurocopa | [Adicionar](https://calendar.google.com/calendar/u/0/r?cid=6c59ceb5c9d3c0d508a7c365fac106b18a2b1f5e8cf61f256b38b19e8c206dc1%40group.calendar.google.com) | [Endereço iCal](https://calendar.google.com/calendar/ical/6c59ceb5c9d3c0d508a7c365fac106b18a2b1f5e8cf61f256b38b19e8c206dc1%40group.calendar.google.com/public/basic.ics) |
-| Copa da Liga Inglesa | [Adicionar](https://calendar.google.com/calendar/u/0/r?cid=28df770f8678c4f6890da87576397504c150669c30d8e2ed6d23fd0262a441a7%40group.calendar.google.com) | [Endereço iCal](https://calendar.google.com/calendar/ical/28df770f8678c4f6890da87576397504c150669c30d8e2ed6d23fd0262a441a7%40group.calendar.google.com/public/basic.ics) |
-| Ceará | [Adicionar](https://calendar.google.com/calendar/u/0/r?cid=2229d57329c1589bf08b9a2752fc29be6fcb7139409a300fb9bd63f866d24a60%40group.calendar.google.com) | [Endereço iCal](https://calendar.google.com/calendar/ical/2229d57329c1589bf08b9a2752fc29be6fcb7139409a300fb9bd63f866d24a60%40group.calendar.google.com/public/basic.ics) |
-| Brasil masculino | [Adicionar](https://calendar.google.com/calendar/u/0/r?cid=5e4c412c5caba27497079e63dd4f54b4eb50f6dafe409a07a58ec63069199558%40group.calendar.google.com) | [Endereço iCal](https://calendar.google.com/calendar/ical/5e4c412c5caba27497079e63dd4f54b4eb50f6dafe409a07a58ec63069199558%40group.calendar.google.com/public/basic.ics) |
+| Calendário              | Google Calendar                                                                                                                                          | Apple Calendar, Outlook e outros                                                                                                                                         |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Champions League        | [Adicionar](https://calendar.google.com/calendar/u/0/r?cid=401be6a3ffc7a181b7569f3dfa362cd7bf797ac26d05f5b49ec3e8043a42bad8%40group.calendar.google.com) | [Endereço iCal](https://calendar.google.com/calendar/ical/401be6a3ffc7a181b7569f3dfa362cd7bf797ac26d05f5b49ec3e8043a42bad8%40group.calendar.google.com/public/basic.ics) |
+| Copa América            | [Adicionar](https://calendar.google.com/calendar/u/0/r?cid=fe1896bb7a29bfc75ceef4e36c22187fa0b3ccb3a60c7275f07bc7dc8b498531%40group.calendar.google.com) | [Endereço iCal](https://calendar.google.com/calendar/ical/fe1896bb7a29bfc75ceef4e36c22187fa0b3ccb3a60c7275f07bc7dc8b498531%40group.calendar.google.com/public/basic.ics) |
+| Eurocopa                | [Adicionar](https://calendar.google.com/calendar/u/0/r?cid=6c59ceb5c9d3c0d508a7c365fac106b18a2b1f5e8cf61f256b38b19e8c206dc1%40group.calendar.google.com) | [Endereço iCal](https://calendar.google.com/calendar/ical/6c59ceb5c9d3c0d508a7c365fac106b18a2b1f5e8cf61f256b38b19e8c206dc1%40group.calendar.google.com/public/basic.ics) |
+| Copa da Liga Inglesa    | [Adicionar](https://calendar.google.com/calendar/u/0/r?cid=28df770f8678c4f6890da87576397504c150669c30d8e2ed6d23fd0262a441a7%40group.calendar.google.com) | [Endereço iCal](https://calendar.google.com/calendar/ical/28df770f8678c4f6890da87576397504c150669c30d8e2ed6d23fd0262a441a7%40group.calendar.google.com/public/basic.ics) |
+| Ceará                   | [Adicionar](https://calendar.google.com/calendar/u/0/r?cid=2229d57329c1589bf08b9a2752fc29be6fcb7139409a300fb9bd63f866d24a60%40group.calendar.google.com) | [Endereço iCal](https://calendar.google.com/calendar/ical/2229d57329c1589bf08b9a2752fc29be6fcb7139409a300fb9bd63f866d24a60%40group.calendar.google.com/public/basic.ics) |
+| Brasil masculino        | [Adicionar](https://calendar.google.com/calendar/u/0/r?cid=5e4c412c5caba27497079e63dd4f54b4eb50f6dafe409a07a58ec63069199558%40group.calendar.google.com) | [Endereço iCal](https://calendar.google.com/calendar/ical/5e4c412c5caba27497079e63dd4f54b4eb50f6dafe409a07a58ec63069199558%40group.calendar.google.com/public/basic.ics) |
 | Copa do Mundo masculina | [Adicionar](https://calendar.google.com/calendar/u/0/r?cid=055de4983aede32a642bd40331aeffaa1bf2c0f2e65919a432499464f24f28c0%40group.calendar.google.com) | [Endereço iCal](https://calendar.google.com/calendar/ical/055de4983aede32a642bd40331aeffaa1bf2c0f2e65919a432499464f24f28c0%40group.calendar.google.com/public/basic.ics) |
-| Copa do Mundo feminina | [Adicionar](https://calendar.google.com/calendar/u/0/r?cid=a8ab46505d7334594054a6bdc61c7c40c8239961ade4785f164025c2d7cd9996%40group.calendar.google.com) | [Endereço iCal](https://calendar.google.com/calendar/ical/a8ab46505d7334594054a6bdc61c7c40c8239961ade4785f164025c2d7cd9996%40group.calendar.google.com/public/basic.ics) |
-| Brasil feminino | [Adicionar](https://calendar.google.com/calendar/u/0/r?cid=101b0eee6b70857535f94f4fd4cfa5408cd6f1b299094e2d2f29a253fd2fc2ec%40group.calendar.google.com) | [Endereço iCal](https://calendar.google.com/calendar/ical/101b0eee6b70857535f94f4fd4cfa5408cd6f1b299094e2d2f29a253fd2fc2ec%40group.calendar.google.com/public/basic.ics) |
+| Copa do Mundo feminina  | [Adicionar](https://calendar.google.com/calendar/u/0/r?cid=a8ab46505d7334594054a6bdc61c7c40c8239961ade4785f164025c2d7cd9996%40group.calendar.google.com) | [Endereço iCal](https://calendar.google.com/calendar/ical/a8ab46505d7334594054a6bdc61c7c40c8239961ade4785f164025c2d7cd9996%40group.calendar.google.com/public/basic.ics) |
+| Brasil feminino         | [Adicionar](https://calendar.google.com/calendar/u/0/r?cid=101b0eee6b70857535f94f4fd4cfa5408cd6f1b299094e2d2f29a253fd2fc2ec%40group.calendar.google.com) | [Endereço iCal](https://calendar.google.com/calendar/ical/101b0eee6b70857535f94f4fd4cfa5408cd6f1b299094e2d2f29a253fd2fc2ec%40group.calendar.google.com/public/basic.ics) |
 
 No Google Calendar, use **Adicionar** e confirme a assinatura. Em outros aplicativos, copie o
 **Endereço iCal** e escolha a opção de assinar um calendário por URL. Não baixe e importe o arquivo:
@@ -80,17 +80,17 @@ uv run python match_sync.py ics \
 
 ## Alvos configurados no GitHub Actions
 
-| Calendário | Tipo | Slug SportScore |
-| --- | --- | --- |
-| Champions League | competição | `uefa-champions-league` |
-| Copa América | competição | `conmebol-copa-america` |
-| Eurocopa | competição | `uefa-european-championship` |
-| Copa da Liga Inglesa | competição | `english-football-league-cup` |
-| Ceará | time | `ceara` |
-| Brasil masculino | time | `brazil` |
-| Copa do Mundo masculina | competição | `fifa-world-cup` |
-| Copa do Mundo feminina | competição | `fifa-womens-world-cup` |
-| Brasil feminino | time | `brazil-women` |
+| Calendário              | Tipo       | Slug SportScore               |
+| ----------------------- | ---------- | ----------------------------- |
+| Champions League        | competição | `uefa-champions-league`       |
+| Copa América            | competição | `conmebol-copa-america`       |
+| Eurocopa                | competição | `uefa-european-championship`  |
+| Copa da Liga Inglesa    | competição | `english-football-league-cup` |
+| Ceará                   | time       | `ceara`                       |
+| Brasil masculino        | time       | `brazil`                      |
+| Copa do Mundo masculina | competição | `fifa-world-cup`              |
+| Copa do Mundo feminina  | competição | `fifa-womens-world-cup`       |
+| Brasil feminino         | time       | `brazil-women`                |
 
 Cada calendário usa uma variável em
 `Settings > Secrets and variables > Actions > Variables`:
@@ -126,17 +126,68 @@ foi validado no mesmo ambiente. Falhas de conexão, `429` e erros temporários d
 tentativas limitadas com backoff e respeito ao `Retry-After`. Se um desafio persistir, o erro inclui
 o identificador `CF-Ray` para diagnóstico e a sincronização falha antes de alterar eventos.
 
+## Desenvolvimento
+
+Instale o Python compatível com `pyproject.toml`, o `uv` e o Node.js 22 (a partir de 22.22.1)
+ou 24 ou superior com npm. As dependências Python ficam em `uv.lock`; as ferramentas npm
+têm versões fixadas em `package-lock.json`.
+
+```bash
+uv sync --locked
+npm ci
+
+# Lint Python com Ruff e JavaScript/JSON com ESLint
+npm run lint
+
+# Corrigir automaticamente os problemas de lint que têm correção segura
+npm run lint:fix
+
+# Formatar Python com Ruff e JavaScript, Markdown, JSON e YAML com Prettier
+npm run format
+
+# Verificar a formatação sem alterar arquivos
+npm run format:check
+
+# Verificar tipos
+uv run --locked mypy
+```
+
+As configurações ficam em `pyproject.toml`, `eslint.config.mjs`, `.prettierrc.json` e `.prettierignore`.
+
+### Hook de pre-commit
+
+O `npm ci` executa o script `prepare` e instala os hooks do Husky. Antes de cada commit,
+o lint-staged processa apenas os arquivos adicionados ao stage com `git add`:
+
+- JavaScript, JSON e JSONC: ESLint com correções automáticas, seguido de Prettier.
+- Markdown e YAML: Prettier.
+- Python: lint com correções seguras e formatação com Ruff.
+
+As correções são incluídas automaticamente no stage. Erros sem correção automática, como
+variáveis indefinidas ou sintaxe inválida, bloqueiam o commit. Em caso de falha, o lint-staged
+restaura o estado anterior. Alterações não adicionadas ao stage são preservadas, inclusive
+em arquivos parcialmente adicionados.
+
+Para executar o hook manualmente nos arquivos em stage, use `npm run lint-staged`.
+Se a instalação tiver usado `--ignore-scripts`, execute `npm run prepare` para ativar os hooks.
+O CI usa `npm ci --ignore-scripts` e executa as verificações completas, sem instalar hooks.
+
+A configuração segue a documentação oficial do [Husky 9.1.7](https://github.com/typicode/husky/blob/v9.1.7/docs/get-started.md),
+do [lint-staged 17.6.2](https://github.com/lint-staged/lint-staged/tree/v17.6.2#configuration),
+do [ESLint 10](https://eslint.org/docs/latest/use/configure/configuration-files)
+e do [Prettier](https://prettier.io/docs/precommit).
+
 ## Testes
 
 ```bash
-uv run python -m unittest -v
+uv run --locked python -m unittest -v
 ```
 
 ## CI/CD
 
-O repositório é um único worker/CLI Python 3.11. O check obrigatório `CI / required` valida o
-lockfile, formatação, lint, tipos, sintaxe, testes e segurança dos workflows em pull requests, pushes
-para `main` e execuções manuais. Ele não recebe segredos nem altera calendários.
+O repositório é um único worker/CLI Python 3.11. O check obrigatório `CI / required` valida os
+lockfiles, formatação com Ruff e Prettier, lint, tipos, sintaxe, testes e segurança dos workflows
+em pull requests, pushes para `main` e execuções manuais. Ele não recebe segredos nem altera calendários.
 
 O workflow agendado existente é a entrega operacional: usa credenciais de produção para atualizar
 os calendários duas vezes ao dia. Build, publicação de pacote, banco de dados, browser, mobile e

@@ -1,0 +1,37 @@
+{
+  "name": "soccer-match-calendar-sync",
+  "private": true,
+  "description": "Development tooling for the Python calendar synchronizer.",
+  "engines": {
+    "node": "^22.22.1 || >=24"
+  },
+  "scripts": {
+    "prepare": "husky",
+    "lint": "npm run lint:python && npm run lint:eslint",
+    "lint:python": "uv run --locked ruff check .",
+    "lint:eslint": "eslint . --max-warnings=0",
+    "lint:fix": "uv run --locked ruff check --fix . && eslint . --fix --max-warnings=0",
+    "lint-staged": "lint-staged",
+    "format": "uv run --locked ruff format . && prettier --write .",
+    "format:check": "uv run --locked ruff format --check . && prettier --check ."
+  },
+  "lint-staged": {
+    "*.{js,mjs,cjs,json,jsonc}": [
+      "eslint --fix --max-warnings=0 --no-warn-ignored",
+      "prettier --write"
+    ],
+    "*.{md,mdx,yml,yaml}": "prettier --write",
+    "*.py": [
+      "uv run --locked ruff check --fix",
+      "uv run --locked ruff format"
+    ]
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@eslint/json": "2.1.1",
+    "eslint": "10.15.0",
+    "husky": "9.1.7",
+    "lint-staged": "17.6.2",
+    "prettier": "3.10.1"
+  }
+}
