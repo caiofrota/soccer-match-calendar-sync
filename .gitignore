@@ -3,3 +3,7 @@ calendar.ics
 .venv/
 __pycache__/
 *.py[cod]
+node_modules/
+.mypy_cache/
+.ruff_cache/
+.husky/_/

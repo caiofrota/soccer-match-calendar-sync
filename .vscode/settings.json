@@ -1,19 +1,19 @@
 {
-    "cSpell.words": [
-        "Caio",
-        "CALDESC",
-        "CALNAME",
-        "CALSCALE",
-        "DTEND",
-        "DTSTAMP",
-        "DTSTART",
-        "Frota",
-        "gcalendar",
-        "googleapiclient",
-        "lxml",
-        "placardefutebol",
-        "PRODID",
-        "VCALENDAR",
-        "VEVENT"
-    ]
+  "cSpell.words": [
+    "Caio",
+    "CALDESC",
+    "CALNAME",
+    "CALSCALE",
+    "DTEND",
+    "DTSTAMP",
+    "DTSTART",
+    "Frota",
+    "gcalendar",
+    "googleapiclient",
+    "lxml",
+    "placardefutebol",
+    "PRODID",
+    "VCALENDAR",
+    "VEVENT"
+  ]
 }

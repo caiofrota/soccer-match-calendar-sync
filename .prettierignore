@@ -1,0 +1,11 @@
+# Dependencies, caches and generated files
+.venv/
+node_modules/
+__pycache__/
+.mypy_cache/
+.ruff_cache/
+.husky/_/
+credentials.json
+*.ics
+uv.lock
+package-lock.json

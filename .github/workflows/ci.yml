@@ -56,11 +56,21 @@ jobs:
       - name: Install locked dependencies
         run: uv sync --locked
 
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install locked development tools
+        run: npm ci --ignore-scripts
+
       - name: Check formatting
-        run: uv run --locked ruff format --check .
+        run: npm run format:check
 
       - name: Lint
-        run: uv run --locked ruff check .
+        run: npm run lint
 
       - name: Check types
         run: uv run --locked mypy
